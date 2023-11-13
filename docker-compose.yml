@@ -1,0 +1,63 @@
+version: "3.8"
+services:
+  cogent-admin:
+    container_name: cogent-admin
+    image: cogent/cogent-admin:v1.0
+    volumes:
+      - cogent-admin-data:/opt/cogent-admin/logs
+      - cogent-admin-data:/opt/cogent-admin/config
+      - cogent-admin-data:/opt/cogent-admin/uploadPath
+      - cogent-admin-data:/opt/device-upgrade-pack-repo
+    network_mode: "host"
+    depends_on:
+      - redis
+      - mysql
+  redis:
+    image: cogent/redis:v1.0
+    container_name: redis
+    command: redis-server /etc/redis/redis.conf --appendonly yes
+    volumes:
+      - redis-data:/data #数据文件挂载
+      - redis-data:/etc/redis
+    network_mode: "host"
+  mysql:
+    container_name: mysql
+    image: cogent/mysql:v1.0
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-time-zone='+08:00'
+    restart: always
+    network_mode: "host"
+    environment:
+      MYSQL_DATABASE: 'cogent-admin'
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - mysql-data:/var/lib/mysql #数据文件挂载
+      - mysql-conf-data:/etc/mysql #配置文件挂载    记得设置时区，东八区
+      - mysql-log-data:/var/log/mysql #日志文件挂载
+  mediakit:
+    image: zlmediakit/zlmediakit:Debug.latest
+    container_name: mediakit
+    volumes:
+      - mediakit-data:/opt/media/bin/log
+      - mediakit-data:/opt/media/conf
+    network_mode: "host"
+  minio:
+    image: quay.io/minio/minio
+    container_name: minio
+    command: server /data --console-address=":9090" --address=":9002" --ftp="address=:8021" --ftp="passive-port-range=30000-40000"
+    environment:
+      MINIO_ROOT_USER: ROOTNAME
+      MINIO_ROOT_PASSWORD: CHANGEME123
+      MINIO_NOTIFY_WEBHOOK_ENABLE_PRIMARY: "on"
+      MINIO_NOTIFY_WEBHOOK_ENDPOINT_PRIMARY: "http://127.0.0.1:8080/buckets/event"
+    volumes:
+      - minio-data:/data
+    network_mode: "host"
+
+volumes:
+  cogent-admin-data:
+  mediakit-data:
+  mysql-data:
+  mysql-conf-data:
+  mysql-log-data:
+  redis-data:
+  minio-data:
