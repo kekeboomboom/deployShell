@@ -55,15 +55,12 @@ if versionLessThan "$docker_version" "19.03.0"; then
 fi
 
 # laod images
-docker load -i redis.tar
 docker load -i mysql.tar
-#docker load -i mediakit.tar
-#docker load -i cogent-admin.tar
+docker load -i yourApplication.tar
 docker load -i minio.tar
 
 # start docker containers
-docker compose up -d redis mysql minio
-#docker compose up -d cogent-admin mediakit
+docker compose up -d mysql yourApplication minio
 
 # check minio is running
 if pgrep -x "minio" >/dev/null; then

@@ -2,7 +2,7 @@ version: "3.8"
 services:
   cogent-admin:
     container_name: cogent-admin
-    image: cogent/cogent-admin:v1.0
+    image: cogent/cogent-admin:v1.5.2
     volumes:
       - cogent-admin-data:/opt/cogent-admin/logs
       - cogent-admin-data:/opt/cogent-admin/config
@@ -13,7 +13,7 @@ services:
       - redis
       - mysql
   redis:
-    image: cogent/redis:v1.0
+    image: cogent/redis:v1.1
     container_name: redis
     command: redis-server /etc/redis/redis.conf --appendonly yes
     volumes:
@@ -22,7 +22,7 @@ services:
     network_mode: "host"
   mysql:
     container_name: mysql
-    image: cogent/mysql:v1.0
+    image: cogent/mysql:v1.1
     command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default-time-zone='+08:00'
     restart: always
     network_mode: "host"
